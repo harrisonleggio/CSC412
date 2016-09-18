@@ -9,7 +9,10 @@ elif [ $# -lt 3 ]; then
     exit 1
 fi
 
-
+if [ ! -f $1 ]; then
+    echo "The file you specified does not exist!"
+    exit 1
+fi
 
 if [ -d $2 ]; then
     rm -rf $2
