@@ -11,15 +11,20 @@ fi
 
 
 
-if [ -d $1 ]; then
-    rm -rf $1
+if [ -d $2 ]; then
+    rm -rf $2
 fi
 
-if [ ! -d $1 ]; then
-    mkdir -p $1;
+if [ ! -d $2 ]; then
+    mkdir -p $2
 fi
 
-for ((i=1; i<=$2; i++));
+
+for ((i=1; i<=$3; i++));
 do
-    echo $i
+    cd $2
+    filename=$(basename "$1")
+    fname="${filename%.*}"
+    cp $1 $fname"_copy_""$i"
+
 done
