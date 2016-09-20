@@ -27,6 +27,7 @@ fi
 for ((i=1; i<=$3; i++));
 do
     cd $2
+    # separates file name from extension for renaming purposes
     filename=$(basename "$1")
     fname="${filename%.*}"
     cp $1 $fname"_copy_""$i"
