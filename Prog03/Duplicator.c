@@ -1,7 +1,7 @@
 /*
     Harrison Leggio
     Prog03
-    Replicator.c 
+    Duplicator.c 
 */
 
 #include <stdio.h>
