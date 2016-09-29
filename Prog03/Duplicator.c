@@ -15,18 +15,6 @@ int main( int argc, char *argv[] ) {
 	// variables containing command args (file name/output folder)
 	char *file_name = argv[1];
 	char *output_folder = argv[2];
-	
-	DIR *dir = opendir(output_folder);
-	
-
-	if (dir) {
-		char new_dir [80];
-		sprintf(new_dir, "%s%s", output_folder, "Archive");
-		int rename_dir = rename(output_folder, new_dir);
-		closedir(dir);		
-	}
-
-	
 		
 	// create directory specified by user
 	int create_dir = mkdir(output_folder, 0700);
