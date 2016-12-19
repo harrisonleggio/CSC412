@@ -24,9 +24,26 @@ typedef struct grid_data{
 } grid_data;
 
 int main(int argc, char** argv) {
-    int grid_size = atoi(argv[1]);
+    
+    FILE *f = fopen("/Users/Harrison/Desktop/robotOutput.txt ", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+    }
+    
+    
+    
+    
+    
+    
+    
+    int grid_size = atoi(argv[1]) * atoi(argv[1]);
     int num_boxes = atoi(argv[2]);
     int num_doors = atoi(argv[3]);
+    
+    fprintf(f, "There are %d Robots and Boxes generated \n", num_boxes);
+    fclose(f);
+    
     
     //printf("%d %d %d", grid_size, num_boxes, num_doors);
     srand(time(0));
@@ -34,14 +51,13 @@ int main(int argc, char** argv) {
         grid_data g;
         g.crx = rand() % grid_size + 1;
         g.cry = rand() % grid_size + 1;
-        g.ibx = rand() % grid_size + 1;
+        g.ibx = rand() % (grid_size-2) + 1;
         g.iby = rand() % (grid_size-2) + 1;
         g.dx = rand() % grid_size + 1;
         g.dy = rand() % grid_size + 1;
         //printf("%d %d %d %d %d %d", g.crx,g.cry,g.ibx,g.iby,g.dx,g.dy);
-        get_path(g,counter);
+        get_path(g,counter, num_boxes);
     }
-    
     
     //using time as seed for rand()
     //srand(time(NULL));
@@ -63,7 +79,7 @@ int main(int argc, char** argv) {
     //get_path(8,2,9,5,5,5);
 }
 
-int get_path(struct grid_data g,counter){
+int get_path(struct grid_data g,counter, num_boxes){
     int crx = g.crx;
     int cry = g.cry;
     int ibx = g.ibx;
@@ -71,12 +87,20 @@ int get_path(struct grid_data g,counter){
     int dx = g.dx;
     int dy = g.dy;
     //printf("%d %d %d %d %d %d",rx,ry,ibx,iby,dx,dy);
+    
+    
     //quadrant 1
+    FILE *f = fopen("/Users/Harrison/Desktop/robotOutput.txt ", "a+");
+    fprintf(f, "\nROBOT %d COORDINATES: %d , %d\n", counter, crx, cry);
+    fprintf(f, "BOX %d COORDINATES: %d , %d\n", counter, ibx, iby);
+    fprintf(f, "ROBOT %d DOOR COORDINATES: %d , %d\n\n", counter, dx, dy);
+    
     if(ibx > dx && iby > dy){
         int xd = crx - ibx;
         if(xd > 0){
             for(int i=0;i< abs(xd-1);i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f, "ROBOT %d MOVE W\n", counter);
                 crx = crx - 1;
             }
             //   crx -= xd-1;
@@ -84,7 +108,8 @@ int get_path(struct grid_data g,counter){
         
         else if(xd < 0 && xd != -1){
             for(int i=0;i<abs(xd+1);i++){
-                printf("ROBOT %d MOVE E\n",counter);
+                printf("ROBOT %d MOVE E\n" ,counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
             //crx += xd + 1;
@@ -93,12 +118,15 @@ int get_path(struct grid_data g,counter){
         else if(xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
             crx = crx+2;
         }
         int xy = cry - iby;
         if(xy > 0){
             for(int i=0;i<xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
             //cry -= xy;
@@ -106,6 +134,7 @@ int get_path(struct grid_data g,counter){
         else if(xy < 0){
             for(int i=0;i< abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
             //cry += xy;
@@ -113,20 +142,25 @@ int get_path(struct grid_data g,counter){
         int xd2 = crx - dx;
         for(int i=0;i<xd2-1;i++){
             printf("ROBOT %d PUSH W\n",counter);
+            fprintf(f,"ROBOT %d PUSH W\n",counter);
             crx = crx - 1;
         }
         //crx = xd2 - 1;
         printf("ROBOT %d MOVE N\n",counter);
         printf("ROBOT %d MOVE W\n",counter);
+        fprintf(f,"ROBOT %d MOVE N\n",counter);
+        fprintf(f,"ROBOT %d MOVE W\n",counter);
         
         crx -= 1;
         cry += 1;
         int xy2 = cry - dy;
         for(int i=0;i<xy2-1;i++){
             printf("ROBOT %d PUSH S\n",counter);
+            fprintf(f,"ROBOT %d PUSH S\n",counter);
             cry = cry - 1;
         }
         printf("ROBOT %d END\n",counter);
+        fprintf(f,"ROBOT %d END\n",counter);
     }
     
     //quadrant 2
@@ -135,6 +169,7 @@ int get_path(struct grid_data g,counter){
         if(xd > 0){
             for(int i=0;i<abs((xd+1));i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
@@ -142,6 +177,8 @@ int get_path(struct grid_data g,counter){
             //   printf("%d\n", crx);
             for(int i=0;i<(abs(xd+1));i++){
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
+                
                 //    printf("%d\n", crx);
                 crx = crx + 1;
             }
@@ -150,31 +187,38 @@ int get_path(struct grid_data g,counter){
         if(xy > 0){
             for(int i=0;i<xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else {
             for(int i=0;i<abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         int xd2 = crx - dx;
         for(int i=0;i<abs(xd2+1);i++){
             printf("ROBOT %d PUSH E\n",counter);
+            fprintf(f,"ROBOT %d PUSH E\n",counter);
             crx = crx + 1;
         }
         printf("ROBOT %d MOVE N\n",counter);
         printf("ROBOT %d MOVE E\n",counter);
+        fprintf(f,"ROBOT %d MOVE N\n",counter);
+        fprintf(f,"ROBOT %d MOVE E\n",counter);
         crx = crx + 1;
         cry = cry + 1;
         
         int xy2 = cry - dy;
         for(int i=0;i<xy2-1;i++){
             printf("ROBOT %d PUSH S\n",counter);
+            fprintf(f,"ROBOT %d PUSH S\n",counter);
             cry = cry - 1;
         }
         printf("ROBOT %d END\n",counter);
+        fprintf(f,"ROBOT %d END\n",counter);
     }
     
     //quadrant 3
@@ -183,12 +227,14 @@ int get_path(struct grid_data g,counter){
         if(xd >0 ){
             for (int i = 0; i < abs(xd +1); i++) {
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
         else if (xd <0 ){
             for (int i = 0; i < abs(xd +1); i++) {
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
         }
@@ -196,23 +242,28 @@ int get_path(struct grid_data g,counter){
         if (xy > 0){
             for (int i = 0; i < abs(xy); i++) {
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else if (xy < 0){
             for (int i = 0; i < abs(xy); i++) {
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         int xd2 = crx - dx;
         for(int i = 0; i < abs(xd2+1); i++){
             printf("ROBOT %d PUSH E\n",counter);
+            fprintf(f,"ROBOT %d PUSH E\n",counter);
             crx = crx + 1;
         }
         
         printf("ROBOT %d MOVE S\n",counter);
         printf("ROBOT %d MOVE E\n",counter);
+        fprintf(f,"ROBOT %d MOVE S\n",counter);
+        fprintf(f,"ROBOT %d MOVE E\n",counter);
         
         crx = crx + 1;
         cry = cry - 1;
@@ -220,9 +271,11 @@ int get_path(struct grid_data g,counter){
         int xy2 = cry - dy;
         for (int i = 0; i < abs(xy2 +1); i++){
             printf("ROBOT %d PUSH N\n",counter);
+            fprintf(f,"ROBOT %d PUSH N\n",counter);
             cry = cry + 1;
         }
         printf("ROBOT %d END\n",counter);
+        fprintf(f,"ROBOT %d END\n",counter);
     }
     
     
@@ -234,16 +287,20 @@ int get_path(struct grid_data g,counter){
         if(xd >0){
             for(int i = 0; i< (xd - 1);i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
         else if ( xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
         }
         else if (xd < 0 && xd != -1){
             for(int i = 0; i< abs(xd - 1);i++){
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
         }
@@ -251,31 +308,37 @@ int get_path(struct grid_data g,counter){
         if (xy > 0){
             for(int i = 0; i< xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else if (xy < 0){
             for(int i = 0; i< abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         int xd2 = crx - dx;
         for (int i = 0; i < (xd2 -1);i++){
             printf("ROBOT %d PUSH W\n",counter);
+            fprintf(f,"ROBOT %d PUSH W\n",counter);
             crx = crx - 1;
         }
         printf("ROBOT %d MOVE S\n",counter);
         printf("ROBOT %d MOVE W\n",counter);
+        fprintf(f,"ROBOT %d MOVE S\n",counter);
+        fprintf(f,"ROBOT %d MOVE W\n",counter);
         crx = crx - 1;
         cry = cry - 1;
         
         int xy2 = cry - dy;
         for (int i = 0; i < abs(xy2+1);i++){
             printf("ROBOT %d PUSH N\n",counter);
+            fprintf(f,"ROBOT %d PUSH N\n",counter);
         }
         printf("ROBOT %d END\n",counter);
-        
+        fprintf(f,"ROBOT %d END\n",counter);
         
     }
     
@@ -285,16 +348,20 @@ int get_path(struct grid_data g,counter){
         if(xd >0){
             for(int i = 0; i< (xd - 1);i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
         else if ( xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
         }
         else if (xd < 0 && xd != -1){
             for(int i = 0; i< abs(xd - 1);i++){
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
         }
@@ -302,26 +369,33 @@ int get_path(struct grid_data g,counter){
         if (xy > 0){
             for(int i = 0; i< xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else if (xy < 0){
             for(int i = 0; i< abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         printf("ROBOT %d MOVE S\n",counter);
         printf("ROBOT %d MOVE W\n",counter);
+        fprintf(f,"ROBOT %d MOVE S\n",counter);
+        fprintf(f,"ROBOT %d MOVE W\n",counter);
         crx = crx - 1;
         cry = cry - 1;
         
         int xy2 = cry - dy;
         for(int i = 0; i< abs(xy2+1);i++){
             printf("ROBOT %d PUSH N\n",counter);
+            fprintf(f,"ROBOT %d PUSH N\n",counter);
             cry = cry + 1;
         }
         printf("ROBOT %d END\n",counter);
+        fprintf(f,"ROBOT %d END\n",counter);
+        
     }
     
     //directly dabove
@@ -330,16 +404,20 @@ int get_path(struct grid_data g,counter){
         if(xd >0){
             for(int i = 0; i< (xd - 1);i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
         else if ( xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
         }
         else if (xd < 0 && xd != -1){
             for(int i = 0; i< abs(xd - 1);i++){
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
         }
@@ -347,26 +425,33 @@ int get_path(struct grid_data g,counter){
         if (xy > 0){
             for(int i = 0; i< xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else if (xy < 0){
             for(int i = 0; i< abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         printf("ROBOT %d MOVE N\n",counter);
         printf("ROBOT %d MOVE W\n",counter);
+        fprintf(f,"ROBOT %d MOVE N\n",counter);
+        fprintf(f,"ROBOT %d MOVE W\n",counter);
         crx = crx - 1;
         cry = cry + 1;
         
         int xy2 = cry - dy;
         for(int i = 0; i< (xy2-1);i++){
             printf("ROBOT %d PUSH S\n",counter);
+            fprintf(f,"ROBOT %d PUSH S\n",counter);
             cry = cry - 1;
         }
         printf("ROBOT %d END\n",counter);
+        fprintf(f,"ROBOT %d END\n",counter);
+        
     }
     
     // directly deleft
@@ -375,16 +460,21 @@ int get_path(struct grid_data g,counter){
         if(xd >0){
             for(int i = 0; i< (xd - 1);i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
         else if ( xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            
         }
         else if (xd < 0 && xd != -1){
             for(int i = 0; i< abs(xd - 1);i++){
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
         }
@@ -392,25 +482,33 @@ int get_path(struct grid_data g,counter){
         if (xy > 0){
             for(int i = 0; i< xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else if (xy < 0){
             for(int i = 0; i< abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         printf("ROBOT %d MOVE W\n",counter);
         printf("ROBOT %d MOVE W\n",counter);
+        fprintf(f,"ROBOT %d MOVE W\n",counter);
+        fprintf(f,"ROBOT %d MOVE W\n",counter);
         crx = crx - 2;
         
         int xd2 = crx - dx;
         for(int i = 0; i< abs(xd2+1);i++){
             printf("ROBOT %d PUSH E\n",counter);
+            fprintf(f,"ROBOT %d PUSH E\n",counter);
             crx = crx + 1;
+            printf("ROBOT %d END\n",counter);
+            fprintf(f,"ROBOT %d END\n",counter);
         }
-        printf("ROBOT %d END\n",counter);
+        
+        
     }
     
     //directly deright
@@ -419,16 +517,20 @@ int get_path(struct grid_data g,counter){
         if(xd >0){
             for(int i = 0; i< (xd - 1);i++){
                 printf("ROBOT %d MOVE W\n",counter);
+                fprintf(f,"ROBOT %d MOVE W\n",counter);
                 crx = crx - 1;
             }
         }
-        else if (xd == -1){
+        else if ( xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
+            fprintf(f,"ROBOT %d MOVE E\n",counter);
         }
         else if (xd < 0 && xd != -1){
             for(int i = 0; i< abs(xd - 1);i++){
                 printf("ROBOT %d MOVE E\n",counter);
+                fprintf(f,"ROBOT %d MOVE E\n",counter);
                 crx = crx + 1;
             }
         }
@@ -436,24 +538,33 @@ int get_path(struct grid_data g,counter){
         if (xy > 0){
             for(int i = 0; i< xy;i++){
                 printf("ROBOT %d MOVE S\n",counter);
+                fprintf(f,"ROBOT %d MOVE S\n",counter);
                 cry = cry - 1;
             }
         }
         else if (xy < 0){
             for(int i = 0; i< abs(xy);i++){
                 printf("ROBOT %d MOVE N\n",counter);
+                fprintf(f,"ROBOT %d MOVE N\n",counter);
                 cry = cry + 1;
             }
         }
         int xd2 = crx - dx;
         for(int i = 0; i < (xd2-1); i++){
             printf ("ROBOT %d PUSH W\n",counter);
+            fprintf(f,"ROBOT %d MOVE W\n",counter);
             crx = crx - 1;
         }
         printf("ROBOT %d END\n",counter);
+        fprintf(f,"ROBOT %d END\n",counter);
+        
     }
+    fclose(f);
+    
     
     return 0;
+    
+    
+    
+    
 }
-
-
