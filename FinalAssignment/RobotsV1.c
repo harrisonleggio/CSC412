@@ -29,9 +29,8 @@ int main(int argc, char** argv) {
     int num_doors = atoi(argv[3]);
     
     //printf("%d %d %d", grid_size, num_boxes, num_doors);
-    
+    srand(time(0));
     for(int counter=1;counter<=num_boxes;counter++){
-        srand(time(NULL));
         grid_data g;
         g.crx = rand() % grid_size + 1;
         g.cry = rand() % grid_size + 1;
@@ -39,7 +38,8 @@ int main(int argc, char** argv) {
         g.iby = rand() % (grid_size-2) + 1;
         g.dx = rand() % grid_size + 1;
         g.dy = rand() % grid_size + 1;
-        get_path(g.crx,g.cry,g.ibx,g.iby,g.dx,g.dy,counter);
+        //printf("%d %d %d %d %d %d", g.crx,g.cry,g.ibx,g.iby,g.dx,g.dy);
+        get_path(g,counter);
     }
     
     
@@ -63,8 +63,13 @@ int main(int argc, char** argv) {
     //get_path(8,2,9,5,5,5);
 }
 
-int get_path(crx,cry,ibx,iby,dx,dy,counter){
-    
+int get_path(struct grid_data g,counter){
+    int crx = g.crx;
+    int cry = g.cry;
+    int ibx = g.ibx;
+    int iby = g.iby;
+    int dx = g.dx;
+    int dy = g.dy;
     //printf("%d %d %d %d %d %d",rx,ry,ibx,iby,dx,dy);
     //quadrant 1
     if(ibx > dx && iby > dy){
