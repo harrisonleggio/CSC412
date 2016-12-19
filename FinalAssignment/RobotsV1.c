@@ -24,7 +24,7 @@ typedef struct grid_data{
 } grid_data;
 
 int main(int argc, char** argv) {
-    int grid_size = atoi(argv[1]) * atoi(argv[1]);
+    int grid_size = atoi(argv[1]);
     int num_boxes = atoi(argv[2]);
     int num_doors = atoi(argv[3]);
     
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
         grid_data g;
         g.crx = rand() % grid_size + 1;
         g.cry = rand() % grid_size + 1;
-        g.ibx = rand() % (grid_size-2) + 1;
+        g.ibx = rand() % grid_size + 1;
         g.iby = rand() % (grid_size-2) + 1;
         g.dx = rand() % grid_size + 1;
         g.dy = rand() % grid_size + 1;
@@ -422,7 +422,7 @@ int get_path(struct grid_data g,counter){
                 crx = crx - 1;
             }
         }
-        else if ( xd == -1){
+        else if (xd == -1){
             printf("ROBOT %d MOVE E\n",counter);
             printf("ROBOT %d MOVE E\n",counter);
         }
