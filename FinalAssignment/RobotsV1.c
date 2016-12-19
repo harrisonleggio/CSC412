@@ -19,9 +19,12 @@ typedef struct grid_data{
     int iby;
     int dx;
     int dy;
+    int counter;
     
     
 } grid_data;
+
+void* get_path(void* param);
 
 int main(int argc, char** argv) {
     
@@ -33,9 +36,9 @@ int main(int argc, char** argv) {
     
     
     
-    
-    
-    
+
+ 
+
     
     int grid_size = atoi(argv[1]) * atoi(argv[1]);
     int num_boxes = atoi(argv[2]);
@@ -43,7 +46,7 @@ int main(int argc, char** argv) {
     
     fprintf(f, "There are %d Robots and Boxes generated \n", num_boxes);
     fclose(f);
-    
+
     
     //printf("%d %d %d", grid_size, num_boxes, num_doors);
     srand(time(0));
@@ -55,8 +58,9 @@ int main(int argc, char** argv) {
         g.iby = rand() % (grid_size-2) + 1;
         g.dx = rand() % grid_size + 1;
         g.dy = rand() % grid_size + 1;
+        g.counter = counter;
         //printf("%d %d %d %d %d %d", g.crx,g.cry,g.ibx,g.iby,g.dx,g.dy);
-        get_path(g,counter, num_boxes);
+        int* val = get_path(&g);
     }
     
     //using time as seed for rand()
@@ -79,18 +83,22 @@ int main(int argc, char** argv) {
     //get_path(8,2,9,5,5,5);
 }
 
-int get_path(struct grid_data g,counter, num_boxes){
+void* get_path(void* param){
+    
+    // cast the pointer
+    grid_data g = *((grid_data*) param);
     int crx = g.crx;
     int cry = g.cry;
     int ibx = g.ibx;
     int iby = g.iby;
     int dx = g.dx;
     int dy = g.dy;
+    int counter = g.counter;
     //printf("%d %d %d %d %d %d",rx,ry,ibx,iby,dx,dy);
     
     
     //quadrant 1
-    FILE *f = fopen("/Users/Harrison/Desktop/robotOutput.txt ", "a+");
+    FILE *f = fopen("/Users/abdulbaqi/Desktop/robotOutput.txt ", "a+");
     fprintf(f, "\nROBOT %d COORDINATES: %d , %d\n", counter, crx, cry);
     fprintf(f, "BOX %d COORDINATES: %d , %d\n", counter, ibx, iby);
     fprintf(f, "ROBOT %d DOOR COORDINATES: %d , %d\n\n", counter, dx, dy);
@@ -178,7 +186,7 @@ int get_path(struct grid_data g,counter, num_boxes){
             for(int i=0;i<(abs(xd+1));i++){
                 printf("ROBOT %d MOVE E\n",counter);
                 fprintf(f,"ROBOT %d MOVE E\n",counter);
-                
+
                 //    printf("%d\n", crx);
                 crx = crx + 1;
             }
@@ -395,7 +403,7 @@ int get_path(struct grid_data g,counter, num_boxes){
         }
         printf("ROBOT %d END\n",counter);
         fprintf(f,"ROBOT %d END\n",counter);
-        
+
     }
     
     //directly dabove
@@ -451,7 +459,7 @@ int get_path(struct grid_data g,counter, num_boxes){
         }
         printf("ROBOT %d END\n",counter);
         fprintf(f,"ROBOT %d END\n",counter);
-        
+
     }
     
     // directly deleft
@@ -508,7 +516,7 @@ int get_path(struct grid_data g,counter, num_boxes){
             fprintf(f,"ROBOT %d END\n",counter);
         }
         
-        
+
     }
     
     //directly deright
@@ -557,14 +565,14 @@ int get_path(struct grid_data g,counter, num_boxes){
         }
         printf("ROBOT %d END\n",counter);
         fprintf(f,"ROBOT %d END\n",counter);
-        
+
     }
     fclose(f);
+
     
+    return NULL;
     
-    return 0;
-    
-    
-    
+
+
     
 }
