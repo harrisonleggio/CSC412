@@ -2,15 +2,15 @@
 //  main.c
 //  CSC412_final
 //
-//  Created by Harrison Leggio on 12/18/16.
-//  Copyright © 2016 Harrison Leggio. All rights reserved.
+//  Created by Harrison Leggio and Araiz Baqi on 12/18/16.
+//  Copyright © 2016 Harrison Leggio and Araiz Baqi. All rights reserved.
 //
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+//struct to store the coordinates of the robot, box, and door each time
 typedef struct grid_data{
     
     int crx;
@@ -23,11 +23,11 @@ typedef struct grid_data{
     
     
 } grid_data;
-
+//declaration of get_path function
 void* get_path(void* param);
 
 int main(int argc, char** argv) {
-    
+    //open output file for reading immediately upon program execution
     FILE *f = fopen("/Users/Harrison/Desktop/robotOutput.txt ", "w");
     if (f == NULL)
     {
@@ -36,20 +36,22 @@ int main(int argc, char** argv) {
     
     
     
-
- 
-
     
-    int grid_size = atoi(argv[1]) * atoi(argv[1]);
+    
+    
+    //3 arguments -> size of grid, number of boxes, and number of doors
+    int grid_size = atoi(argv[1]);
     int num_boxes = atoi(argv[2]);
     int num_doors = atoi(argv[3]);
-    
+    //first statement to be written to the output file
     fprintf(f, "There are %d Robots and Boxes generated \n", num_boxes);
     fclose(f);
-
     
-    //printf("%d %d %d", grid_size, num_boxes, num_doors);
+    
+    //use current time as the seed for random number generation
     srand(time(0));
+    //create N structs, where N is the number of robots passed as an argument
+    //this is where we generate the random numbers to be used as coordinates
     for(int counter=1;counter<=num_boxes;counter++){
         grid_data g;
         g.crx = rand() % grid_size + 1;
@@ -59,30 +61,27 @@ int main(int argc, char** argv) {
         g.dx = rand() % grid_size + 1;
         g.dy = rand() % grid_size + 1;
         g.counter = counter;
-        //printf("%d %d %d %d %d %d", g.crx,g.cry,g.ibx,g.iby,g.dx,g.dy);
+        //pass the struct to our get_path function
         int* val = get_path(&g);
     }
     
-    //using time as seed for rand()
-    //srand(time(NULL));
-    // robot coordinates
-    //int crx = rand() % 10 + 1;
-    //int cry = rand() % 10 + 1;
-    //printf("%d %d\n",crx,cry);
-    
-    // box coordinates
-    //int ibx = rand() % 8 + 2;
-    //int iby = rand() % 8 + 2;
-    //printf("%d %d\n",ibx,iby);
-    
-    // door coordinates
-    //int dx = rand() % 10 + 1;
-    //int dy = rand() % 10 + 1;
-    //printf("%d %d\n",dx,dy);
-    
-    //get_path(8,2,9,5,5,5);
 }
+//get_path function receives the struct containing coordinates and
+//completes the task of pushing the box to the appropriate door
 
+//for all cases we do our math by determing the boxs location with regards to
+//the location of the door
+
+//in most cases, besides a few which will be pointed out, we perform these steps:
+//1. find the delta x distance between the robot and the box and move the robot
+//2. find the delta y distance between the robot and the box and move the robot
+//3. find the delta x distance between the box and the door and push the box
+//4. reposition the robot so it's in the proper grid square to make the final push
+//5. find the delta y distance between the box and the door and push the box
+//6. end
+
+//in the special cases, we ALWAYS first move the robot to the square directly to the right
+//of the box, get in position for the single push, and then push the box to the door
 void* get_path(void* param){
     
     // cast the pointer
@@ -97,12 +96,14 @@ void* get_path(void* param){
     //printf("%d %d %d %d %d %d",rx,ry,ibx,iby,dx,dy);
     
     
-    //quadrant 1
-    FILE *f = fopen("/Users/abdulbaqi/Desktop/robotOutput.txt ", "a+");
+    //open the output file and write the coordinates used in this instance
+    FILE *f = fopen("/Users/Harrison/Desktop/robotOutput.txt ", "a+");
     fprintf(f, "\nROBOT %d COORDINATES: %d , %d\n", counter, crx, cry);
     fprintf(f, "BOX %d COORDINATES: %d , %d\n", counter, ibx, iby);
     fprintf(f, "ROBOT %d DOOR COORDINATES: %d , %d\n\n", counter, dx, dy);
     
+    //this rather large if statement handles scenarios where the box is in the first
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if(ibx > dx && iby > dy){
         int xd = crx - ibx;
         if(xd > 0){
@@ -171,7 +172,8 @@ void* get_path(void* param){
         fprintf(f,"ROBOT %d END\n",counter);
     }
     
-    //quadrant 2
+    //this rather large if statement handles scenarios where the box is in the second
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if (ibx < dx && iby > dy){
         int xd = crx - ibx;
         if(xd > 0){
@@ -186,7 +188,7 @@ void* get_path(void* param){
             for(int i=0;i<(abs(xd+1));i++){
                 printf("ROBOT %d MOVE E\n",counter);
                 fprintf(f,"ROBOT %d MOVE E\n",counter);
-
+                
                 //    printf("%d\n", crx);
                 crx = crx + 1;
             }
@@ -229,7 +231,8 @@ void* get_path(void* param){
         fprintf(f,"ROBOT %d END\n",counter);
     }
     
-    //quadrant 3
+    //this rather large if statement handles scenarios where the box is in the third
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if (ibx < dx && iby < dy){
         int xd = crx - ibx;
         if(xd >0 ){
@@ -288,8 +291,8 @@ void* get_path(void* param){
     
     
     
-    //quadrant 4
-    
+    //this rather large if statement handles scenarios where the box is in the fourth
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if (ibx > dx && iby < dy){
         int xd = crx - ibx;
         if(xd >0){
@@ -350,7 +353,8 @@ void* get_path(void* param){
         
     }
     
-    // directly delow
+    //this is one of the special cases where the box spawns directly below the door with the same
+    //x coordinates. this means only 1 push is required to move the box to the door
     if(ibx == dx && iby < dy){
         int xd = crx - ibx;
         if(xd >0){
@@ -403,10 +407,11 @@ void* get_path(void* param){
         }
         printf("ROBOT %d END\n",counter);
         fprintf(f,"ROBOT %d END\n",counter);
-
+        
     }
     
-    //directly dabove
+    //this is one of the special cases where the box spawns directly above the door with the same
+    //x coordinates. this means only 1 push is required to move the box to the door
     if (ibx == dx && iby > dy){
         int xd = crx - ibx;
         if(xd >0){
@@ -459,10 +464,11 @@ void* get_path(void* param){
         }
         printf("ROBOT %d END\n",counter);
         fprintf(f,"ROBOT %d END\n",counter);
-
+        
     }
     
-    // directly deleft
+    //this is one of the special cases where the box spawns directly to the left of the door
+    //with the same y coordinates. this means only 1 push is required to move the box to the door
     if (iby == dy && ibx < dx){
         int xd = crx - ibx;
         if(xd >0){
@@ -516,10 +522,11 @@ void* get_path(void* param){
             fprintf(f,"ROBOT %d END\n",counter);
         }
         
-
+        
     }
     
-    //directly deright
+    //this is one of the special cases where the box spawns directly to the right of the door
+    //with the same y coordinates. this means only 1 push is required to move the box to the door
     if (iby == dy && ibx > dx){
         int xd = crx - ibx;
         if(xd >0){
@@ -565,14 +572,14 @@ void* get_path(void* param){
         }
         printf("ROBOT %d END\n",counter);
         fprintf(f,"ROBOT %d END\n",counter);
-
+        
     }
     fclose(f);
-
+    
     
     return NULL;
     
-
-
+    
+    
     
 }
