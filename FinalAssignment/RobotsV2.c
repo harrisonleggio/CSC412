@@ -2,8 +2,8 @@
 //  main.c
 //  CSC412_final
 //
-//  Created by Harrison Leggio on 12/18/16.
-//  Copyright © 2016 Harrison Leggio. All rights reserved.
+//  Created by Harrison Leggio and Araiz Baqi on 12/18/16.
+//  Copyright © 2016 Harrison Leggio and Araiz Baqi. All rights reserved.
 //
 
 #include <stdio.h>
@@ -13,7 +13,7 @@
 #include <pthread.h>
 #include <string.h>			// for strerror()
 #include <unistd.h>			// for usleep()
-
+//struct to store the coordinates of the robot, box, and door each time
 typedef struct grid_data{
     
     int crx;
@@ -26,7 +26,7 @@ typedef struct grid_data{
     
     
 } grid_data;
-
+//declaration of get_path function
 void* get_path(void* param);
 
 //	this is the mutex lock that we will use to control the access by all
@@ -35,26 +35,21 @@ pthread_mutex_t myLock;
 FILE *f;
 
 int main(int argc, char** argv) {
-    
+     //open output file for reading immediately upon program execution
     f = fopen("/Users/Harrison/Desktop/robotOutput.txt ", "w");
     if (f == NULL)
     {
         printf("Error opening file!\n");
     }
     
-    
-    
-    
-    
-    
-    
+    //3 arguments -> size of grid, number of boxes, and number of doors
     int grid_size = atoi(argv[1]);
     int num_boxes = atoi(argv[2]);
     int num_doors = atoi(argv[3]);
-    
+    //initial statement that we write to the output file
     fprintf(f, "There are %d Robots and Boxes generated \n", num_boxes);
     
-
+    //create the arrays to store the threads and structs
     pthread_t robot[num_boxes];
     grid_data g[num_boxes];
     
@@ -66,7 +61,7 @@ int main(int argc, char** argv) {
     // acquire the lock to get sole access to file output
     pthread_mutex_lock(&myLock);
     
-    //printf("%d %d %d", grid_size, num_boxes, num_doors);
+    //here we loop up until num_boxes and build the structs with random numbers
     srand((unsigned int)time(0));
     for(int i=0, counter=1;counter<=num_boxes;i++,counter++){
  
@@ -82,8 +77,7 @@ int main(int argc, char** argv) {
         fprintf(f, "BOX %d COORDINATES: %d , %d\n", g[i].counter, g[i].ibx, g[i].iby);
         fprintf(f, "ROBOT %d DOOR COORDINATES: %d , %d\n\n", g[i].counter, g[i].dx, g[i].dy);
 
-        //printf("%d %d %d %d %d %d", g.crx,g.cry,g.ibx,g.iby,g.dx,g.dy);
-        
+        //send each struct in a thread to get_path as a void option as it's created
         int err = pthread_create(robot + i, NULL, get_path, g + i);
         if (err != 0)
         {
@@ -102,29 +96,33 @@ int main(int argc, char** argv) {
         printf("Robot %d joined.\n", i);
    }
     
-    //using time as seed for rand()
-    //srand(time(NULL));
-    // robot coordinates
-    //int crx = rand() % 10 + 1;
-    //int cry = rand() % 10 + 1;
-    //printf("%d %d\n",crx,cry);
-    
-    // box coordinates
-    //int ibx = rand() % 8 + 2;
-    //int iby = rand() % 8 + 2;
-    //printf("%d %d\n",ibx,iby);
-    
-    // door coordinates
-    //int dx = rand() % 10 + 1;
-    //int dy = rand() % 10 + 1;
-    //printf("%d %d\n",dx,dy);
-    
-    //get_path(8,2,9,5,5,5);
 
     fclose(f);
     return 0;
 }
 
+//get_path function receives the struct containing coordinates and
+//completes the task of pushing the box to the appropriate door
+
+//for all cases we do our math by determing the boxs location with regards to
+//the location of the door
+
+//in most cases, besides a few which will be pointed out, we perform these steps:
+//1. find the delta x distance between the robot and the box and move the robot
+//2. find the delta y distance between the robot and the box and move the robot
+//3. find the delta x distance between the box and the door and push the box
+//4. reposition the robot so it's in the proper grid square to make the final push
+//5. find the delta y distance between the box and the door and push the box
+//6. end
+
+//in the special cases, we ALWAYS first move the robot to the square directly to the right
+//of the box, get in position for the single push, and then push the box to the door
+
+//what differentiates this get_path from the get_path in v1 is that we are using multithreading here
+//we have to first cast the pointer of the struct back to a struct before working with it
+
+//before every print statement, we lock the mutex so that we don't get any mangled messages
+//after we print, we then unlock the mutex
 void* get_path(void* param){
     
     // cast the pointer
@@ -139,9 +137,8 @@ void* get_path(void* param){
     //printf("%d %d %d %d %d %d",rx,ry,ibx,iby,dx,dy);
     
     
-    //quadrant 1
-//    FILE *f = fopen("/Users/abdulbaqi/Desktop/robotOutput.txt ", "a+");
-    
+    //this rather large if statement handles scenarios where the box is in the first
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if(ibx > dx && iby > dy){
         int xd = crx - ibx;
         if(xd > 0){
@@ -234,7 +231,8 @@ void* get_path(void* param){
         pthread_mutex_unlock(&myLock);
     }
     
-    //quadrant 2
+    //this rather large if statement handles scenarios where the box is in the second
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if (ibx < dx && iby > dy){
         int xd = crx - ibx;
         if(xd > 0){
@@ -316,7 +314,8 @@ void* get_path(void* param){
         pthread_mutex_unlock(&myLock);
     }
     
-    //quadrant 3
+    //this rather large if statement handles scenarios where the box is in the third
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if (ibx < dx && iby < dy){
         int xd = crx - ibx;
         if(xd >0 ){
@@ -399,8 +398,8 @@ void* get_path(void* param){
     
     
     
-    //quadrant 4
-    
+    //this rather large if statement handles scenarios where the box is in the fourth
+    //quadrant of the grid (we assume the door is the "center" of the grid
     if (ibx > dx && iby < dy){
         int xd = crx - ibx;
         if(xd >0){
@@ -488,7 +487,8 @@ void* get_path(void* param){
         
     }
     
-    // directly delow
+    //this is one of the special cases where the box spawns directly below the door with the same
+    //x coordinates. this means only 1 push is required to move the box to the door
     if(ibx == dx && iby < dy){
         int xd = crx - ibx;
         if(xd >0){
@@ -569,7 +569,8 @@ void* get_path(void* param){
         
     }
     
-    //directly dabove
+    //this is one of the special cases where the box spawns directly above the door with the same
+    //x coordinates. this means only 1 push is required to move the box to the door
     if (ibx == dx && iby > dy){
         int xd = crx - ibx;
         if(xd >0){
@@ -649,7 +650,8 @@ void* get_path(void* param){
         
     }
     
-    // directly deleft
+    //this is one of the special cases where the box spawns directly to the left of the door
+    //with the same y coordinates. this means only 1 push is required to move the box to the door
     if (iby == dy && ibx < dx){
         int xd = crx - ibx;
         if(xd >0){
@@ -730,7 +732,8 @@ void* get_path(void* param){
         
     }
     
-    //directly deright
+    //this is one of the special cases where the box spawns directly to the right of the door
+    //with the same y coordinates. this means only 1 push is required to move the box to the door
     if (iby == dy && ibx > dx){
         int xd = crx - ibx;
         if(xd >0){
